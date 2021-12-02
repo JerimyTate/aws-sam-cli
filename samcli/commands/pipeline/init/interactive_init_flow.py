@@ -120,7 +120,17 @@ class InteractiveInitFlow:
             pipeline_template_local_dir: Path = _clone_pipeline_templates(
                 pipeline_template_git_location, tempdir_path, CUSTOM_PIPELINE_TEMPLATE_REPO_LOCAL_NAME
             )
-            return self._generate_from_pipeline_template(pipeline_template_local_dir)
+            pipeline_templates_manifest: PipelineTemplatesManifest = _read_app_pipeline_templates_manifest(
+                pipeline_template_local_dir
+            )
+            # The manifest contains multiple pipeline-templates so select one
+            selected_pipeline_template_metadata: PipelineTemplateMetadata = _prompt_pipeline_template(
+                pipeline_templates_manifest
+            )
+            selected_pipeline_template_dir: Path = pipeline_template_local_dir.joinpath(
+                selected_pipeline_template_metadata.location
+            )
+            return self._generate_from_pipeline_template(selected_pipeline_template_dir)
 
     def _prompt_run_bootstrap_within_pipeline_init(
         self, stage_configuration_names: List[str], number_of_stages: int
